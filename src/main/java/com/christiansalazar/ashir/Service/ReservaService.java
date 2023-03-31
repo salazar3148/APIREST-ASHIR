@@ -57,10 +57,15 @@ public class ReservaService {
         return libres;
     }
     public List<Habitacion> habitacionesDisponibles(String fecha, String tipo) {
+        Set<String> tipos = Set.of("ESTANDAR", "PREMIUM");
+
+        if(!tipos.contains(tipo.toUpperCase())) throw new ApiRequestException("type room not valid");
+
         List<Habitacion> disponibles = habitacionesDisponibles(fecha).
                 stream().
                 filter(habitacion -> habitacion.getTipo().equals(tipo.toUpperCase()))
                 .collect(Collectors.toList());
+
         return disponibles;
     }
 
@@ -74,10 +79,9 @@ public class ReservaService {
         if(reservaRequest.getFecha() == null) throw new ApiRequestException("null date not allowed");
         if(reservaRequest.getFecha().isBefore(LocalDate.now())) throw new ApiRequestException("date before today");
 
-
         Optional<Habitacion> habitacionAReservar = habitacionesDisponibles(reservaRequest.getFecha().toString())
                 .stream()
-                .filter(hab -> hab.getNumero() == reservaRequest.getNumeroHabitacion())
+                .filter(hab -> hab.getNumero().equals(reservaRequest.getNumeroHabitacion()))
                 .findFirst();
 
         if(!habitacionAReservar.isPresent()) throw new ApiRequestException("room not available");
@@ -93,10 +97,19 @@ public class ReservaService {
     }
 
     public List<Reserva> reservasCliente(Long cedulaCliente) {
+        Optional<Cliente> cliente = clienteRepository.findById(cedulaCliente);
+
+        if(!cliente.isPresent()) throw new ApiRequestException("user not found");
+
         List<Reserva> reservas = new ArrayList();
         reservaRepository.findAll().forEach(reserva -> {
             if(reserva.getCliente().getCedula().equals(cedulaCliente)) reservas.add(reserva);
         });
+
         return reservas;
     }
+
+
+
+
 }

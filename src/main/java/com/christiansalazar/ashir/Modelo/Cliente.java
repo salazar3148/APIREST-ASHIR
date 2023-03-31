@@ -22,7 +22,7 @@ public class Cliente {
     private String direccion;
 
     @Column(name="EDAD")
-    private Long edad;
+    private Integer edad;
 
     @Column(name="EMAIL")
     private String email;
@@ -30,7 +30,7 @@ public class Cliente {
     public Cliente() {
     }
 
-    public Cliente(Long cedula, String nombre, String apellido, String direccion, Long edad, String email) {
+    public Cliente(Long cedula, String nombre, String apellido, String direccion, Integer edad, String email) {
         this.cedula = cedula;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -55,7 +55,7 @@ public class Cliente {
         return direccion;
     }
 
-    public Long getEdad() {
+    public Integer getEdad() {
         return edad;
     }
 

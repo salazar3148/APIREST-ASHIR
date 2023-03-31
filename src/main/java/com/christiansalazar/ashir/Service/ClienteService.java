@@ -17,7 +17,7 @@ public class ClienteService {
     }
 
     public Cliente agregarCliente(Cliente cliente){
-        if(cliente.getCedula() == null && cliente.getCedula() instanceof Long) throw new ApiRequestException("Invalid id");
+        if(cliente.getCedula() == null) throw new ApiRequestException("Invalid id");
         if(cliente.getNombre() == null) throw new ApiRequestException("null name not allowed");
         if(cliente.getApellido() == null) throw new ApiRequestException("null lastname not allowed");
         clienteRepository.save(cliente);
