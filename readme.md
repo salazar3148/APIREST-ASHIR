@@ -27,3 +27,5 @@ Una reserva está definida por:
 - Habitación
 - Cliente
 - Total a pagar
+
+#### Toda la documentación en Swagger
