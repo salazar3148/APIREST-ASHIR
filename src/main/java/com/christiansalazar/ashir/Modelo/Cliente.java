@@ -1,13 +1,19 @@
 package com.christiansalazar.ashir.Modelo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@ApiModel(description = "Modelo para representar un CLIENTE")
 @Entity
 @Table(name="CLIENTES")
 public class Cliente {
+
+    @ApiModelProperty(value = "Clave unica del cliente")
     @Id
     @Column(name="CEDULA")
     private Long cedula;

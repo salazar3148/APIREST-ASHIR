@@ -1,5 +1,7 @@
 package com.christiansalazar.ashir.Service;
 
+import com.christiansalazar.ashir.DTO.HabitacionDTO;
+import com.christiansalazar.ashir.DTO.ReservaDTO;
 import com.christiansalazar.ashir.Excepciones.ApiRequestException;
 import com.christiansalazar.ashir.Modelo.Cliente;
 import com.christiansalazar.ashir.Modelo.Habitacion;
@@ -10,7 +12,6 @@ import com.christiansalazar.ashir.Repository.HabitacionRepository;
 import com.christiansalazar.ashir.Repository.ReservaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.*;
@@ -30,7 +31,7 @@ public class ReservaService {
         this.clienteRepository = clienteRepository;
     }
 
-    public List<Habitacion> habitacionesDisponibles(String fecha){
+    public List<HabitacionDTO> habitacionesDisponibles(String fecha){
         String validar = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[0-1])$";
 
         if(!fecha.matches(validar)) throw new ApiRequestException("invalid date format");
@@ -45,31 +46,30 @@ public class ReservaService {
         }
 
         Set<Habitacion> ocupados = new HashSet<>();
-        reservaRepository.findAll().forEach(reserva -> {
-            if(reserva.getFecha().equals(date)) ocupados.add(reserva.getHabitacion());
-        });
+        reservaRepository.findAll().stream()
+                        .filter(reserva -> reserva.getFecha().equals(date))
+                        .forEach(reserva -> ocupados.add(reserva.getHabitacion()));
 
-        List<Habitacion> libres = new ArrayList<>();
-
-        habitacionRepository.findAll().forEach(habitacion -> {
-            if(!ocupados.contains(habitacion)) libres.add(habitacion);
-        });
+        List<HabitacionDTO> libres = habitacionRepository.findAll()
+                        .stream()
+                        .filter(habitacion -> !ocupados.contains(habitacion))
+                        .map(habitacion -> new HabitacionDTO(habitacion.getNumero(), habitacion.getTipo()))
+                        .collect(Collectors.toList());
         return libres;
     }
-    public List<Habitacion> habitacionesDisponibles(String fecha, String tipo) {
+    public List<HabitacionDTO> habitacionesDisponibles(String fecha, String tipo) {
         Set<String> tipos = Set.of("ESTANDAR", "PREMIUM");
 
         if(!tipos.contains(tipo.toUpperCase())) throw new ApiRequestException("type room not valid");
 
-        List<Habitacion> disponibles = habitacionesDisponibles(fecha).
+        List<HabitacionDTO> disponibles = habitacionesDisponibles(fecha).
                 stream().
                 filter(habitacion -> habitacion.getTipo().equals(tipo.toUpperCase()))
                 .collect(Collectors.toList());
-
         return disponibles;
     }
 
-    public Reserva reservar(ReservaRequest reservaRequest){
+    public ReservaDTO reservar(ReservaRequest reservaRequest){
         Optional<Cliente> cliente = clienteRepository.findById(reservaRequest.getCedulaCliente());
         if(!cliente.isPresent()) throw new ApiRequestException("user not found");
 
@@ -79,33 +79,45 @@ public class ReservaService {
         if(reservaRequest.getFecha() == null) throw new ApiRequestException("null date not allowed");
         if(reservaRequest.getFecha().isBefore(LocalDate.now())) throw new ApiRequestException("date before today");
 
-        Optional<Habitacion> habitacionAReservar = habitacionesDisponibles(reservaRequest.getFecha().toString())
+        Optional<HabitacionDTO> habitacionAReservar = habitacionesDisponibles(reservaRequest.getFecha().toString())
                 .stream()
                 .filter(hab -> hab.getNumero().equals(reservaRequest.getNumeroHabitacion()))
                 .findFirst();
 
         if(!habitacionAReservar.isPresent()) throw new ApiRequestException("room not available");
 
-        Integer total = habitacionAReservar.get().getPrecioBase();
+        Integer total = habitacion.get().getPrecioBase();
 
         if(habitacionAReservar.get().getTipo().equalsIgnoreCase("premium")) total = (int) (total * 0.95);
         Reserva reserva = new Reserva(habitacion.get(), cliente.get(), reservaRequest.getFecha(), total);
 
-        reservaRepository.save(reserva);
+        ReservaDTO reservaDTO = new ReservaDTO(
+                reserva.getCodigo(),
+                reserva.getHabitacion().getNumero(),
+                reserva.getCliente().getCedula(),
+                reserva.getFecha(),
+                reserva.getTotal()
+        );
 
-        return reserva;
+        reservaRepository.save(reserva);
+        return reservaDTO;
     }
 
-    public List<Reserva> reservasCliente(Long cedulaCliente) {
+    public List<ReservaDTO> reservasCliente(Long cedulaCliente) {
         Optional<Cliente> cliente = clienteRepository.findById(cedulaCliente);
-
         if(!cliente.isPresent()) throw new ApiRequestException("user not found");
 
-        List<Reserva> reservas = new ArrayList();
-        reservaRepository.findAll().forEach(reserva -> {
-            if(reserva.getCliente().getCedula().equals(cedulaCliente)) reservas.add(reserva);
-        });
-
+        List<ReservaDTO> reservas = reservaRepository.findAll()
+                .stream()
+                .filter(reserva -> reserva.getCliente().getCedula().equals(cedulaCliente))
+                .map(reserva -> new ReservaDTO(
+                        reserva.getCodigo(),
+                        reserva.getHabitacion().getNumero(),
+                        reserva.getCliente().getCedula(),
+                        reserva.getFecha(),
+                        reserva.getTotal()
+                ))
+                .collect(Collectors.toList());
         return reservas;
     }
 }

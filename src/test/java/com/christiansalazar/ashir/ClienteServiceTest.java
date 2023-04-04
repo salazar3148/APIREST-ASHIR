@@ -1,4 +1,5 @@
 package com.christiansalazar.ashir;
+import com.christiansalazar.ashir.DTO.ClienteDTO;
 import com.christiansalazar.ashir.Excepciones.ApiRequestException;
 import com.christiansalazar.ashir.Modelo.Cliente;
 import com.christiansalazar.ashir.Repository.ClienteRepository;
@@ -32,7 +33,7 @@ public class ClienteServiceTest {
 
         //Act
 
-        Cliente cliente = new Cliente(cedula, nombre, apellido, direccion, edad, email);
+        ClienteDTO cliente = new ClienteDTO(cedula, nombre, apellido, direccion, edad, email);
         clienteService.agregarCliente(cliente);
     }
 
@@ -49,7 +50,7 @@ public class ClienteServiceTest {
 
         //Act
 
-        Cliente cliente = new Cliente(cedula, nombre, apellido, direccion, edad, email);
+        ClienteDTO cliente = new ClienteDTO(cedula, nombre, apellido, direccion, edad, email);
         clienteService.agregarCliente(cliente);
     }
 
@@ -65,7 +66,7 @@ public class ClienteServiceTest {
 
         //Act
 
-        Cliente cliente = new Cliente(cedula, nombre, apellido, direccion, edad, email);
+        ClienteDTO cliente = new ClienteDTO(cedula, nombre, apellido, direccion, edad, email);
         clienteService.agregarCliente(cliente);
 
     }
@@ -82,7 +83,7 @@ public class ClienteServiceTest {
 
         //Act
 
-        Cliente cliente = new Cliente(cedula, nombre, apellido, direccion, edad, email);
+        ClienteDTO cliente = new ClienteDTO(cedula, nombre, apellido, direccion, edad, email);
         clienteService.agregarCliente(cliente);
 
         //Assert

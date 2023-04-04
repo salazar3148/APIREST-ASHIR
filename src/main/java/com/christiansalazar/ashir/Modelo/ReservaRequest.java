@@ -1,7 +1,10 @@
 package com.christiansalazar.ashir.Modelo;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.time.LocalDate;
 
+@ApiIgnore
 public class ReservaRequest {
     private Long cedulaCliente;
     private Integer numeroHabitacion;

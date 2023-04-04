@@ -1,13 +1,19 @@
 package com.christiansalazar.ashir.Modelo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@ApiModel(description = "Modelo para representar una HABITACION")
 @Entity
 @Table(name="HABITACIONES")
 public class Habitacion {
+
+    @ApiModelProperty(value = "Clave unica de la habitación")
     @Id
     @Column(name="NUMERO")
     private Integer numero;
@@ -37,11 +43,5 @@ public class Habitacion {
 
     public Integer getPrecioBase() {
         return precioBase;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(this.numero == ((Habitacion)obj).getNumero()) return true;
-        return false;
     }
 }

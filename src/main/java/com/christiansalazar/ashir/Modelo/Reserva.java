@@ -1,11 +1,17 @@
 package com.christiansalazar.ashir.Modelo;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
+@ApiModel(description = "Modelo para representar una RESERVA")
 @Entity
 @Table(name="RESERVAS")
 public class Reserva {
+
+    @ApiModelProperty(value = "Clave unica de la reserva")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="CODIGO")
